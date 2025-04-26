@@ -25,6 +25,16 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authenticationRoutes);  // Authentication Routes
 
+// Serve uploads folder
+app.use(
+    "/uploads",
+    express.static(path.join(__dirname, "uploads"), {
+        setHeaders: (res, path) => {
+            res.set("Access-Control-Allow-Origin", "http://localhost:5173");
+        },
+    })
+);
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server started on PORT: ${PORT}`));
