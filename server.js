@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db.config");
 const authenticationRoutes = require("./routes/auth.routes");
+const resumeRoutes = require("./routes/resume.routes");
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authenticationRoutes);  // Authentication Routes
+app.use("/api/resume", resumeRoutes); // Resume Routes
 
 // Serve uploads folder
 app.use(
