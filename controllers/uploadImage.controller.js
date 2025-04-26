@@ -14,7 +14,10 @@ const uploadResumeImages = async (req, res) => {
             }
 
             const resumeId = req.params.id;
-            const resume = await Resume.findOne({ _id: resumeId, userId: req.user._id });
+            const resume = await Resume.findOne({ 
+                _id: resumeId,          // Resume ID
+                userId: req.user._id    // User ID
+            });
 
             if (!resume) {
                 return res.status(400).json({
@@ -33,10 +36,12 @@ const uploadResumeImages = async (req, res) => {
                 if (resume.thumbnailLink) {
                     const oldThumbnail = path.join(uploadsFolder, path.basename(resume.thumbnailLink));
 
+                    // Delete old thumbnail if exists
                     if (fs.existsSync(oldThumbnail)) {
                         fs.unlinkSync(oldThumbnail);
                     }
                 }
+                // Set save path to uploads folder
                 resume.thumbnailLink = `${baseUrl}/uploads/${newThumbnail.filename}`;
             }
 
@@ -45,10 +50,12 @@ const uploadResumeImages = async (req, res) => {
                 if (resume.profileInfo?.profilePreviewUrl) {
                     const oldProfileImage = path.join(uploadsFolder, path.basename(resume.profileInfo.profilePreviewUrl));
 
+                    // Delete profile image if exists
                     if (fs.existsSync(oldProfileImage)) {
                         fs.unlinkSync(oldProfileImage);
                     }
                 }
+                // Set save path to uploads folder
                 resume.profileInfo.profilePreviewUrl = `${baseUrl}/uploads/${newProfileImage.filename}`;
             }
 
@@ -56,7 +63,9 @@ const uploadResumeImages = async (req, res) => {
 
             res.status(200).json({
                 message: "Images uploaded and updated successfully! 🎉",
-                thumbnailLink: resume.thumbnailLink,
+                // Thumbnail image link
+                thumbnailLink: resume.thumbnailLink,     
+                // Profile image link               
                 profilePreviewUrl: resume.profileInfo.profilePreviewUrl,
             });
         });

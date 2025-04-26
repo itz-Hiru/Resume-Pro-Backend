@@ -72,9 +72,9 @@ const createResume = async (req, res) => {
         };
 
         const newResume = await Resume.create({
-            userId: req.user._id,
-            title,
-            ...defaultResumeData,
+            userId: req.user._id,   // User ID
+            title,                  // Resume title
+            ...defaultResumeData,   // Resume data
         });
 
         res.status(200).json({
@@ -108,7 +108,10 @@ const getUserResume = async (req, res) => {
 // http://localhost:3000/api/resume/get/:id
 const getResumeById = async (req, res) => {
     try {
-        const resume = await Resume.findOne({ _id: req.params.id, userId: req.user._id });
+        const resume = await Resume.findOne({ 
+            _id: req.params.id,     // Resume ID
+            userId: req.user._id    // User ID
+        });
 
         if (!resume) {
             return res.status(400).json({
@@ -132,8 +135,8 @@ const getResumeById = async (req, res) => {
 const updateResume = async (req, res) => {
     try {
         const resume = await Resume.findOne({
-            _id: req.params.id,
-            userId: req.user._id
+            _id: req.params.id,     // Resume ID
+            userId: req.user._id    // User ID
         });
 
         if (!resume) {
@@ -164,8 +167,8 @@ const updateResume = async (req, res) => {
 const deleteResume = async (req, res) => {
     try {
         const resume = await Resume.findOne({
-            _id: req.params.id,
-            userId: req.user._id
+            _id: req.params.id,     // Resume ID
+            userId: req.user._id    // User ID
         });
 
         if (!resume) {
@@ -174,12 +177,13 @@ const deleteResume = async (req, res) => {
             });
         }
 
-        // Delete thumbnail link and profile preview Url images from uploads folder
+        // Delete thumbnail image and profile preview Url images from uploads folder
         const uploadsFolder = path.join(__dirname, "..", "uploads");
 
         if (resume.thumbnailLink) {
             const oldThumbnail = path.join(uploadsFolder, path.basename(resume.thumbnailLink));
 
+            // Delete thumbnail image if exists
             if (fs.existsSync(oldThumbnail)) {
                 fs.unlinkSync(oldThumbnail);
             }
@@ -188,14 +192,16 @@ const deleteResume = async (req, res) => {
         if (resume.profileInfo?.profilePreviewUrl) {
             const oldProfile = path.join(uploadsFolder, path.basename(resume.profileInfo.profilePreviewUrl));
 
+            // Delete profile preview image if exists
             if (fs.existsSync(oldProfile)) {
                 fs.unlinkSync(oldProfile);
             }
         }
 
+        // Delete resume
         const deleted = await Resume.findByIdAndDelete({
-            _id: req.params.id,
-            userId: req.user._id
+            _id: req.params.id,     // Resume ID
+            userId: req.user._id    // User ID
         });
 
         res.status(200).json({
