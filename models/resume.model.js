@@ -14,7 +14,7 @@ const ResumeSchema = new mongoose.Schema(
         thumbnailLink: {
             type: String,
         },
-        templates: {
+        template: {
             theme: String,
             colorPalette: [String],
         },

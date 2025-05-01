@@ -16,6 +16,10 @@ const createResume = async (req, res) => {
                 designation: "",
                 summary: "",
             },
+            template: {
+                theme: "",
+                colorPalette: [""],
+            },
             contactInfo: {
                 email: "",
                 phone: "",
