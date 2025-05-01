@@ -44,7 +44,7 @@ const ResumeSchema = new mongoose.Schema(
         education: [
             {
                 degree: String,
-                insititution: String,
+                institution: String,
                 startDate: String,
                 endDate: String,
             },
@@ -63,7 +63,7 @@ const ResumeSchema = new mongoose.Schema(
                 liveDemo: String,
             },
         ],
-        certification: [
+        certifications: [
             {
                 title: String,
                 issuer: String,
