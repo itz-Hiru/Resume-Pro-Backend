@@ -144,15 +144,39 @@ const updateResume = async (req, res) => {
         });
 
         if (!resume) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Resume not found. Please double-check the ID and try again."
             });
         }
 
-        // Merge updates from req.body into existing resume
+        const uploadsFolder = path.join(__dirname, "..", "uploads");
+
+        // ✅ Handle profile image removal
+        if (req.body.removeProfileImage === "true") {
+            // Delete profile image file if it exists
+            if (resume.profileInfo?.profileImg) {
+                const oldImage = path.join(uploadsFolder, path.basename(resume.profileInfo.profileImg));
+                if (fs.existsSync(oldImage)) {
+                    fs.unlinkSync(oldImage);
+                }
+            }
+
+            // Delete profile preview image file if it exists
+            if (resume.profileInfo?.profilePreviewUrl) {
+                const oldPreview = path.join(uploadsFolder, path.basename(resume.profileInfo.profilePreviewUrl));
+                if (fs.existsSync(oldPreview)) {
+                    fs.unlinkSync(oldPreview);
+                }
+            }
+
+            // Clear profile image data in DB
+            resume.profileInfo.profileImg = null;
+            resume.profileInfo.profilePreviewUrl = "";
+        }
+
+        // ✅ Merge other updates from req.body (excluding profile image if it's removed)
         Object.assign(resume, req.body);
 
-        // Save updated resume
         const saveResume = await resume.save();
 
         res.status(200).json({
@@ -165,7 +189,7 @@ const updateResume = async (req, res) => {
             error: error.message
         });
     }
-}
+};
 
 // http://localhost:3000/api/resume/delete/:id
 const deleteResume = async (req, res) => {

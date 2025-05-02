@@ -14,9 +14,9 @@ const uploadResumeImages = async (req, res) => {
             }
 
             const resumeId = req.params.id;
-            const resume = await Resume.findOne({ 
-                _id: resumeId,          // Resume ID
-                userId: req.user._id    // User ID
+            const resume = await Resume.findOne({
+                _id: resumeId,
+                userId: req.user._id
             });
 
             if (!resume) {
@@ -30,42 +30,45 @@ const uploadResumeImages = async (req, res) => {
 
             const newThumbnail = req.files.thumbnail?.[0];
             const newProfileImage = req.files.profileImage?.[0];
+            const removeProfile = req.body.removeProfileImage === "true";
 
-            // If new thumbnail uploaded, delete old thumbnail
+            // ✅ Handle thumbnail update
             if (newThumbnail) {
                 if (resume.thumbnailLink) {
                     const oldThumbnail = path.join(uploadsFolder, path.basename(resume.thumbnailLink));
-
-                    // Delete old thumbnail if exists
                     if (fs.existsSync(oldThumbnail)) {
                         fs.unlinkSync(oldThumbnail);
                     }
                 }
-                // Set save path to uploads folder
                 resume.thumbnailLink = `${baseUrl}/uploads/${newThumbnail.filename}`;
             }
 
-            // If new profile image uploaded, delete old profile image
+            // ✅ Handle profile image update or removal
             if (newProfileImage) {
                 if (resume.profileInfo?.profilePreviewUrl) {
-                    const oldProfileImage = path.join(uploadsFolder, path.basename(resume.profileInfo.profilePreviewUrl));
-
-                    // Delete profile image if exists
-                    if (fs.existsSync(oldProfileImage)) {
-                        fs.unlinkSync(oldProfileImage);
+                    const oldProfile = path.join(uploadsFolder, path.basename(resume.profileInfo.profilePreviewUrl));
+                    if (fs.existsSync(oldProfile)) {
+                        fs.unlinkSync(oldProfile);
                     }
                 }
-                // Set save path to uploads folder
                 resume.profileInfo.profilePreviewUrl = `${baseUrl}/uploads/${newProfileImage.filename}`;
+                resume.profileInfo.profileImg = `${baseUrl}/uploads/${newProfileImage.filename}`;
+            } else if (removeProfile) {
+                if (resume.profileInfo?.profilePreviewUrl) {
+                    const oldProfile = path.join(uploadsFolder, path.basename(resume.profileInfo.profilePreviewUrl));
+                    if (fs.existsSync(oldProfile)) {
+                        fs.unlinkSync(oldProfile);
+                    }
+                }
+                resume.profileInfo.profilePreviewUrl = "";
+                resume.profileInfo.profileImg = null;
             }
 
             await resume.save();
 
             res.status(200).json({
                 message: "Images uploaded and updated successfully! 🎉",
-                // Thumbnail image link
-                thumbnailLink: resume.thumbnailLink,     
-                // Profile image link               
+                thumbnailLink: resume.thumbnailLink,
                 profilePreviewUrl: resume.profileInfo.profilePreviewUrl,
             });
         });
